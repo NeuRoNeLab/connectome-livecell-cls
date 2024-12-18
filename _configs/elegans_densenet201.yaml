@@ -1,0 +1,201 @@
+# lightning.pytorch==2.2.0dev
+seed_everything: 42
+trainer:
+  accelerator: cuda
+  strategy: auto
+  devices: auto
+  num_nodes: 1
+  precision: 16-mixed # 32-true
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      name: elegans-densenet201
+      save_dir: .
+      version: null
+      offline: false
+      dir: null
+      id: null
+      anonymous: null
+      project: ElegansFormerLivecell
+      log_model: false
+      experiment: null
+      prefix: ''
+      checkpoint_name: null
+      job_type: null
+      config: null
+      entity: null
+      reinit: null
+      tags: null
+      group: null
+      notes: null
+      magic: null
+      config_exclude_keys: null
+      config_include_keys: null
+      mode: null
+      allow_val_change: null
+      resume: null
+      force: null
+      tensorboard: null
+      sync_tensorboard: null
+      monitor_gym: null
+      save_code: null
+      settings: null
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: null
+        filename: elegansformer-{epoch:03d}-{val/final_loss:.3f}
+        monitor: val/final_loss
+        verbose: true
+        save_last: null
+        save_top_k: 2
+        save_weights_only: false
+        mode: min
+        auto_insert_metric_name: true
+        every_n_train_steps: null
+        train_time_interval: null
+        every_n_epochs: null
+        save_on_train_epoch_end: true
+    - class_path: models.callbacks.ConfusionMatrixCallback
+      init_args:
+        out_name: densenet201_elegans
+        out_path: /media/neurone-pc10/Volume/Backup/Andrea/connectome-nn/_plots/livecell_conf_matrices
+        normalize: "true"
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val/final_loss
+        min_delta: 0.0
+        patience: 10
+        verbose: true
+        mode: min
+        strict: true
+        check_finite: true
+        stopping_threshold: null
+        divergence_threshold: null
+        check_on_train_epoch_end: null
+        log_rank_zero_only: false
+    #    - class_path: lightning.pytorch.callbacks.StochasticWeightAveraging
+    #      init_args:
+    #        swa_lrs: 0.05
+    #        swa_epoch_start: 8
+    #        annealing_epochs: 10
+    #        annealing_strategy: cos
+    #        avg_fn: null
+    #        device: null
+  fast_dev_run: false
+  max_epochs: 250
+  min_epochs: 25
+  max_steps: -1
+  min_steps: null
+  max_time: null
+  limit_train_batches: null
+  limit_val_batches: null
+  limit_test_batches: null
+  limit_predict_batches: null
+  overfit_batches: 0.0
+  val_check_interval: null
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: null
+  log_every_n_steps: 50
+  enable_checkpointing: null
+  enable_progress_bar: null
+  enable_model_summary: null
+  accumulate_grad_batches: 2  # 8
+  gradient_clip_val: null
+  gradient_clip_algorithm: null
+  deterministic: null
+  benchmark: null
+  inference_mode: true
+  use_distributed_sampler: true
+  profiler: null
+  detect_anomaly: false
+  barebones: false
+  plugins: null
+  sync_batchnorm: true
+  reload_dataloaders_every_n_epochs: 0
+  default_root_dir: /media/neurone-pc10/Volume/Backup/Andrea/connectome-nn
+model:
+  config:
+    class_path: models.elegans_vision.elegans_vision.VisionElegansConfig
+    init_args:
+      in_channels: 3 # 1
+      output_dim: 8
+      backbone_config:
+        class_path: models.vision.backbone_utils.TorchVisionBackboneConfig
+        init_args:
+          name: densenet201
+          feature_extractor_return_nodes:
+            - flatten  # avgpool
+      dropout: 0.0
+      tensornet_config:
+        source: data/connectomes/celegans.graphml
+        input_dim: 1920  # 768 # 512 x resnet18 #2048 x resnet 101
+        embedding_dim: 512 # 512
+        activation: hardtanh  # hardtanh best
+        skip_connection_type: add
+        reapply_unit_synapses:
+          - SS
+          - SI
+          - SM
+          - II  # then remove this
+          - IM
+          - MM
+        ignored_synapses: null
+        processing_order: S->O,I->O,M->M # S->S,S->O,I->I,I->O,M->O,M->M  # S->O,I->O,M->O,S->S,I->I,M->M
+        attention_type: learn-q-cross-skip # best for now # cross
+        head_dim: 64  #32
+        n_heads: 8
+        dropout_mha: 0.0
+        norm_output: false # false # true
+        norm_tensor_unit: true
+        input_sequences: independent
+      tensornet_impl: functional
+      reservoir_tensornet: false
+      residual_tensornet: false
+      #norm_tensornet_input: true
+  loss_type: CROSS_ENTROPY
+  loss_config: null
+  custom_loss_fn: null
+  optimizer_type: ADAMW
+  optimizer_config:
+    all:
+      lr: 1e-4 # 1e-4 # 1e-6
+      betas:
+        - 0.9
+        - 0.999
+      weight_decay: 0.1 # 0.1 # 0.00  #0.01
+  lr_scheduler_config:
+      class_path: models.configs.LRSchedulerConfig
+      init_args:
+        name: REDUCE_LR_PLATEAU
+        params:
+          mode: min
+          factor: 0.5
+          patience: 2
+          verbose: true
+          threshold: 1e-4
+          threshold_mode: rel
+          cooldown: 0
+          min_lr: 0
+          eps: 1e-08
+        interval: epoch
+        frequency: 1
+        monitor: val/final_loss
+  metric_params:
+    average: weighted
+data:
+  class_path: ds.livecell_datamodule.LivecellDataModule
+  init_args:
+    root_images: /media/neurone-pc10/Volume/Backup/Andrea/connectome-nn/data/livecell
+    task: bbox
+    dataset_name: drug_vs_nodrug
+    batch_size: 128 # 256
+    num_workers: 10
+    shuffle: false # per forza false se usi sampler
+    custom_collate_fn: null
+    custom_sampler: null
+    use_weighted_random_sampler: true
+    resize_to:
+      - 224
+      - 224
+    to_rgb: true  # try commenting this
