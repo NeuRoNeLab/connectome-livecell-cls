@@ -66,7 +66,7 @@ The above picture describes the the process in which single-cell images are extr
 We evaluate standard deep learning architectures for single-cell classification, including ResNet and DenseNet for efficient feature reuse, EfficientNet/EfficientNetV2 for parameter-efficient scaling, and Vision Transformers (ViTs) for global context modeling. MLP-Mixer offers a lightweight alternative, while hybrid ResNet-ViT models combine CNNs' local feature extraction with Transformers' global attention, exemplified by ResNet18-ViT-B/1 and ResNet101-ViT-B/1.
 
 ## Elegans-AI Framework
-![plot](./_images/tensornet-merged.png)
+![image](./_images/tensornet-merged.png)
 Elegans-AI is a connectomic deep learning framework is a connectomic deep learning inspired by the _C.elegans_ neural connectome. It leverages an encoder-decoder architecture with a Tensor Network core to replicate the biological network's topology. The encoder maps inputs into a latent space, while the TN, structured like an input graph (e.g. the _C.elegans_ connectome), processes inputs via sensor, interneuron, and motor nodes, each modeled as trainable tensor units. These units integrate incoming signals and update states, enabling recurrent dynamics for robust signal propagation. The decoder transforms outputs into task-specific formats. This structure provides high expressivity and integrates seamlessly with deep learning workflows.
 
 ## Connectome-Inspired Model Variants
