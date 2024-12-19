@@ -81,8 +81,8 @@ Tensor Network variants extend the Elegans-AI framework by integrating modules d
     <img src="./_images/new_xai_fig.png" width="800">
 </p>
 <p align="center">
-    <img src="./_images/effnet_umap.png" width="500">
-    <img src="./_images/mlpmixer_umap.png" width="500">
+    <img src="./_images/effnet_umap0.png" width="500">
+    <img src="./_images/mlpmixer_umap0.png" width="500">
 </p>
 
 # Model's Weights
