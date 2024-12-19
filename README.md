@@ -55,6 +55,8 @@ LIVECell-CLS is a  dataset specifically designed for label-free cell classificat
 
 Other than its scale, LIVECell-CLS inherits from LIVECell a wide range of cell morphologies, temporal diversity across three days of imaging, and varying culture densities. This provides a more comprehensive and challenging benchmark compared to smaller datasets, and offers insights into the progression of cellular behaviors. Individual cells were isolated using COCO-format annotations, with backgrounds replaced by a black fill to ensure models focus on cell morphology alone. Standardized preprocessing, including resizing and zero-padding, is applied to uniform the cell images.
 
+The above picture describes the the process in which single-cell images are extracted from the LIVECell ones using the COCO annotations. The images are from eight cell lines (A172, BT-474, BV-2, Huh7, MCF7, SH-SY5Y, SkBr3, SK-OV-3) showcase inter-class and intra-class variability between the three days of imaging. Rows highlight increasing inter-class differences: (a) minimal variability with mostly rounded shapes, (b) distinct morphological traits like elongation, and (c) irregular, atypical structures. Intra-class consistency remains high, but Row (c)'s irregularity complicates classification due to potential class overlaps.
+
 # Models 
 
 # Results 
