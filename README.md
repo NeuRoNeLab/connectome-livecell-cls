@@ -25,7 +25,7 @@
 # Table of Contents 
 1. [Introduction](#introduction)
 2. [LIVECell-CLS Dataset](#livecell-cls-dataset)
-3. [Methods](#methods)
+3. [Models](#models)
 4. [Results](#results)
 5. [Models' Weights](#models-weights)
 6. [Installation Guide](#installation-guide)
