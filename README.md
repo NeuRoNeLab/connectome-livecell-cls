@@ -19,6 +19,7 @@
  <a href="#"><img src="https://img.shields.io/github/languages/top/NeuRoNeLab/connectome-livecell-cls?style=for-the-badge" alt="Languages"/></a>
 </p>
 
+![plot](./_images/figure1-v3.png)
 
 
 # Table of Contents 
@@ -48,6 +49,11 @@ To further enhance performance, we introduce Tensor Network variants inspired by
 Additionally, using Explainable AI techniques and UMAP visualizations, we provide insights into how these models process cell image data, highlighting improved feature separability and decision-making precision, especially for morphologically similar cell lines. This repository includes the LIVECell-CLS dataset, pre-trained models, and tools to facilitate reproducibility and further research in this domain.
 
 # LIVECell-CLS Dataset
+![plot](./_images/cells_explore_new.png)
+
+LIVECell-CLS is a  dataset specifically designed for label-free cell classification, derived from the LIVECell segmentation dataset. It features 1,686,352 single-cell images extracted from eight diverse cell lines, making it the largest publicly available dataset of its kind. The dataset retains the pre-defined train, validation, and test splits of the original LIVECell dataset for consistency, offering a robust foundation for benchmarking and developing machine learning models.
+
+Other than its scale, LIVECell-CLS inherits from LIVECell a wide range of cell morphologies, temporal diversity across three days of imaging, and varying culture densities. This provides a more comprehensive and challenging benchmark compared to smaller datasets, and offers insights into the progression of cellular behaviors. Individual cells were isolated using COCO-format annotations, with backgrounds replaced by a black fill to ensure models focus on cell morphology alone. Standardized preprocessing, including resizing and zero-padding, is applied to uniform the cell images.
 
 # Methods 
 
