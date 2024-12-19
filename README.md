@@ -26,6 +26,9 @@
 1. [Introduction](#introduction)
 2. [LIVECell-CLS Dataset](#livecell-cls-dataset)
 3. [Models](#models)
+   - [Baselines](#baselines)
+   - [Elegans AI Framework](#elegans-ai-framework)
+   - [Connectome-Inspired Model Variants](#connectome-inspired-model-variants)
 4. [Results](#results)
 5. [Models' Weights](#models-weights)
 6. [Installation Guide](#installation-guide)
@@ -58,6 +61,17 @@ Other than its scale, LIVECell-CLS inherits from LIVECell a wide range of cell m
 The above picture describes the the process in which single-cell images are extracted from the LIVECell ones using the COCO annotations. The images are from eight cell lines (A172, BT-474, BV-2, Huh7, MCF7, SH-SY5Y, SkBr3, SK-OV-3) showcase inter-class and intra-class variability between the three days of imaging. Rows highlight increasing inter-class differences: (a) minimal variability with mostly rounded shapes, (b) distinct morphological traits like elongation, and (c) irregular, atypical structures. Intra-class consistency remains high, but Row (c)'s irregularity complicates classification due to potential class overlaps.
 
 # Models 
+
+## Baselines
+We evaluate standard deep learning architectures for single-cell classification, including ResNet and DenseNet for efficient feature reuse, EfficientNet/EfficientNetV2 for parameter-efficient scaling, and Vision Transformers (ViTs) for global context modeling. MLP-Mixer offers a lightweight alternative, while hybrid ResNet-ViT models combine CNNs' local feature extraction with Transformers' global attention, exemplified by ResNet18-ViT-B/1 and ResNet101-ViT-B/1.
+
+## Elegans-AI Framework
+![plot](./_images/tensornet-merged.png)
+Elegans-AI is a connectomic deep learning framework is a connectomic deep learning inspired by the _C.elegans_ neural connectome. It leverages an encoder-decoder architecture with a Tensor Network core to replicate the biological network's topology. The encoder maps inputs into a latent space, while the TN, structured like an input graph (e.g. the _C.elegans_ connectome), processes inputs via sensor, interneuron, and motor nodes, each modeled as trainable tensor units. These units integrate incoming signals and update states, enabling recurrent dynamics for robust signal propagation. The decoder transforms outputs into task-specific formats. This structure provides high expressivity and integrates seamlessly with deep learning workflows.
+
+## Connectome-Inspired Model Variants
+![plot](./_images/elegans_variant_figure.png)
+Tensor Network variants extend the Elegans-AI framework by integrating modules derived from various graph structures into existing deep learning architectures like ResNet, ViT, MLP-Mixer, DenseNet, and EfficientNetV2. These models replace traditional fully connected heads with TN modules constructed either from the _C.elegans_ connectome (e.g., Elegans-ResNet, Elegans-ViT) or from stochastic graphs generated using algorithms like Barabási-Albert (BA), Erdős-Rényi (ER), and Watts-Strogatz (WS). This design explores how different topologies affect model performance. The Tensor Network module operates post-pooling or post-attention, processing embeddings with minimal additional parameters (~20M for a 512-dimension vector) while potentially offering increased representational power. The _C.elegans_ connectome, being sparse, incurs lower computational costs compared to denser stochastic graphs, while retaining biologically inspired efficiency. This modular approach provides a flexible and scalable way to augment diverse architectures.
 
 # Results 
 
