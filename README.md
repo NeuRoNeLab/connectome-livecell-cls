@@ -74,6 +74,16 @@ Elegans-AI is a connectomic deep learning framework is a connectomic deep learni
 Tensor Network variants extend the Elegans-AI framework by integrating modules derived from various graph structures into existing deep learning architectures like ResNet, ViT, MLP-Mixer, DenseNet, and EfficientNetV2. As shown by the above image, these models replace traditional fully connected heads with TN modules constructed either from the _C.elegans_ connectome (i.e. Elegans variants, e.g. Elegans-ResNet, Elegans-ViT, ...) or from stochastic graphs generated using algorithms like Barabási-Albert (BA variants), Erdős-Rényi (ER variants), and Watts-Strogatz (WS variants). This design explores how different topologies affect model performance. The Tensor Network module operates post-pooling or post-attention, processing embeddings with minimal additional parameters (~20M for a 512-dimension vector) while potentially offering increased representational power. The _C.elegans_ connectome, being sparse, incurs lower computational costs compared to denser stochastic graphs, while retaining biologically inspired efficiency. This modular approach provides a flexible and scalable way to augment diverse architectures.
 
 # Results 
+<p align="center">
+    <img src="./_images/results_barplot.png" width="800">
+</p>
+<p align="center">
+    <img src="./_images/new_xai_fig.png" width="800">
+</p>
+<p align="center">
+    <img src="./_images/effnet_umap.png" width="500">
+    <img src="./_images/mlpmixer_umap.png" width="500">
+</p>
 
 # Model's Weights
 
