@@ -30,6 +30,9 @@
    - [Elegans AI Framework](#elegans-ai-framework)
    - [Connectome-Inspired Model Variants](#connectome-inspired-model-variants)
 4. [Results](#results)
+   - [Classification Benchmark](#classification-benchmark)
+   - [Embedding Space Visualization](#embedding-space-visualization)
+   - [XAI Analysis](#xai-analysis)
 5. [Models' Weights](#models-weights)
 6. [Installation Guide](#installation-guide)
    - [Installing Python](#installing-python)
@@ -77,14 +80,15 @@ Elegans-AI is a connectomic deep learning framework is a connectomic deep learni
 Tensor Network variants extend the Elegans-AI framework by integrating modules derived from various graph structures into existing deep learning architectures like ResNet, ViT, MLP-Mixer, DenseNet, and EfficientNetV2. As shown by the above image, these models replace traditional fully connected heads with TN modules constructed either from the _C.elegans_ connectome (i.e. Elegans variants, e.g. Elegans-ResNet, Elegans-ViT, ...) or from stochastic graphs generated using algorithms like Barabási-Albert (BA variants), Erdős-Rényi (ER variants), and Watts-Strogatz (WS variants). This design explores how different topologies affect model performance. The Tensor Network module operates post-pooling or post-attention, processing embeddings with minimal additional parameters (~20M for a 512-dimension vector) while potentially offering increased representational power. The _C.elegans_ connectome, being sparse, incurs lower computational costs compared to denser stochastic graphs, while retaining biologically inspired efficiency. This modular approach provides a flexible and scalable way to augment diverse architectures.
 
 # Results 
+
+## Classification Benchmark
 <p align="center">
     <img src="./_images/results_barplot.png" width="800">
 </p>
 
 CNN-based models consistently outperform ViTs and MLP-Mixer architectures in single-cell classification, with smaller architectures like ResNet18 and EfficientNet-B0 achieving balanced accuracies of 86.72% and 89.06%, respectively. These models also maintain high F1-scores (e.g., EfficientNet-B0 reaches 92.71%), outperforming ViT-B/32 (81.02% accuracy, 89.21% F1-score) despite its much larger parameter count. The observed trend highlights the effectiveness of CNNs in data-limited scenarios, where their inductive biases towards local feature extraction are advantageous. The Elegans-enhanced models introduce consistent performance gains across all architectures. For example, Elegans-EfficientNetV2-M achieves a test accuracy of 90.35% and an F1-score of 94.82%, improving over its baseline by nearly 1%. Similarly, Elegans-ResNet18 surpasses ResNet101's performance while having significantly fewer parameters. This trend extends to other families, like DenseNet and MLP-Mixer, with Elegans variants consistently demonstrating higher accuracy and F1-scores compared to their baselines.
 
-
-
+## Embedding Space Visualization
 <p align="center">
     <img src="./_images/effnet_umap0.png" width="500">
     <img src="./_images/mlpmixer_umap0.png" width="500">
@@ -92,8 +96,7 @@ CNN-based models consistently outperform ViTs and MLP-Mixer architectures in sin
 
 UMAP visualizations of model embeddings highlight improved class separability in Elegans variants. EfficientNet-based models produce well-defined clusters, with Elegans-EfficientNetV2-M enhancing separability further. For example, clusters for cell types such as A172 and Huh-7 are more distinct, demonstrating better feature extraction. Elegans-MLP-Mixer-B/16, while starting from a less effective baseline, exhibits one of the highest gains in clustering quality, showing the TN’s impact in improving even weaker models.
 
-
-
+## XAI Analysis
 <p align="center">
     <img src="./_images/new_xai_fig.png" width="800">
 </p>
