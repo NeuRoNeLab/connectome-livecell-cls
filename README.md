@@ -80,20 +80,25 @@ Tensor Network variants extend the Elegans-AI framework by integrating modules d
 <p align="center">
     <img src="./_images/results_barplot.png" width="800">
 </p>
-CNN-based models consistently outperform ViTs and MLP-Mixer architectures in single-cell classification, with smaller architectures like ResNet18 and EfficientNet-B0 achieving balanced accuracies of 86.72% and 89.06%, respectively. These models also maintain high F1-scores (e.g., EfficientNet-B0 reaches 92.71%), outperforming ViT-B/32 (81.02% accuracy, 89.21% F1-score) despite its much larger parameter count. The observed trend highlights the effectiveness of CNNs in data-limited scenarios, where their inductive biases towards local feature extraction are advantageous.
 
-The Elegans-enhanced models introduce consistent performance gains across all architectures. For example, Elegans-EfficientNetV2-M achieves a test accuracy of 90.35% and an F1-score of 94.82%, improving over its baseline by nearly 1%. Similarly, Elegans-ResNet18 surpasses ResNet101's performance while having significantly fewer parameters. This trend extends to other families, like DenseNet and MLP-Mixer, with Elegans variants consistently demonstrating higher accuracy and F1-scores compared to their baselines.
+CNN-based models consistently outperform ViTs and MLP-Mixer architectures in single-cell classification, with smaller architectures like ResNet18 and EfficientNet-B0 achieving balanced accuracies of 86.72% and 89.06%, respectively. These models also maintain high F1-scores (e.g., EfficientNet-B0 reaches 92.71%), outperforming ViT-B/32 (81.02% accuracy, 89.21% F1-score) despite its much larger parameter count. The observed trend highlights the effectiveness of CNNs in data-limited scenarios, where their inductive biases towards local feature extraction are advantageous. The Elegans-enhanced models introduce consistent performance gains across all architectures. For example, Elegans-EfficientNetV2-M achieves a test accuracy of 90.35% and an F1-score of 94.82%, improving over its baseline by nearly 1%. Similarly, Elegans-ResNet18 surpasses ResNet101's performance while having significantly fewer parameters. This trend extends to other families, like DenseNet and MLP-Mixer, with Elegans variants consistently demonstrating higher accuracy and F1-scores compared to their baselines.
+
+
 
 <p align="center">
     <img src="./_images/effnet_umap0.png" width="500">
     <img src="./_images/mlpmixer_umap0.png" width="500">
 </p>
+
 UMAP visualizations of model embeddings highlight improved class separability in Elegans variants. EfficientNet-based models produce well-defined clusters, with Elegans-EfficientNetV2-M enhancing separability further. For example, clusters for cell types such as A172 and Huh-7 are more distinct, demonstrating better feature extraction. Elegans-MLP-Mixer-B/16, while starting from a less effective baseline, exhibits one of the highest gains in clustering quality, showing the TN’s impact in improving even weaker models.
+
+
 
 <p align="center">
     <img src="./_images/new_xai_fig.png" width="800">
 </p>
-XAI visualizations align with numerical and embedding analysis. Elegans-enhanced models demonstrate more focused heatmaps, particularly on biologically critical regions like cell nuclei and shapes. For instance, GradCAM and LIME maps for Elegans-EfficientNetV2-M show precise feature attribution, improving upon the baseline’s often scattered and less informative attributions. In challenging cases like SKOV-3 cells, the Elegans variant correctly classifies them with highly localized attention maps, while the baseline struggles, highlighting the Elegans model’s superior capacity for meaningful feature extraction. Even in failure scenarios, such as SHSY-5Y cells, the Elegans maps remain less dispersed, showcasing improved robustness.
+
+XAI visualizations align with numerical and embedding analysis. Elegans-enhanced models demonstrate more focused heatmaps, particularly on biologically critical regions like cell nuclei and shapes. For instance, GradCAM and LIME maps for Elegans-EfficientNetV2-M show precise feature attribution, improving upon the baseline’s often scattered and less informative attributions. In challenging cases like the shown SKOV-3 cell, the Elegans variant correctly classifies them with highly localized attention maps, while the baseline struggles, highlighting the Elegans model’s improved capacity for meaningful feature extraction. Even in failure scenarios, such as SHSY-5Y cells, the Elegans maps remain less dispersed, showcasing improved robustness.
 
 # Model's Weights
 
