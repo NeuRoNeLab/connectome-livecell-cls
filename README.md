@@ -137,7 +137,17 @@ pip install -r requirements.txt
 ```
 
 # Getting to know the Model
-The experimental setup is based on the Lightning API, and employs the LightningCLI that manages the hyperparameter configurations through yaml files. The configuration of most of our baseline and proposed architectures are provided in the ```_configs``` directory.
+The experimental setup is based on the Lightning API, and employs the LightningCLI that manages the hyperparameter configurations through yaml files. The configuration of most of our baseline and proposed architectures are provided in the ```_configs``` directory. Of course, specific directory paths and logging informations need to be updated in order to be used on any machine.
+
+## Logging
+By default, the Weights & Biases (WandB) platform is used to track the experiments, which needs you to have an account and be logged in it on your machine. This is done by the following command:
+
+```shell 
+python wandb login
+```
+Refer to the [WandB site](https://wandb.ai/site) for more information.
+
+In each configuration yaml file, you can update the logging settings (including, most importantly, the name of the project) by modifying the ```logger``` field values according to your preferences. You can also replace WandB logging by replacing the logging fields with the default ```CSVLogger``` or disable logging entirely by setting ```logger``` to ```null```.
 
 ## Training
 To train a model, find the corresponding CLI script (e.g. ```backbone_cli.py```, ```elegans_vision_cli.py```, ...), and the desired yaml configuration file (e.g. ```densenet161.yaml```, ```elegans_efficientnetv2m.yaml```, ...), then start the training with the LightningCLI. 
