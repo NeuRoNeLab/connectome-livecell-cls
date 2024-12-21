@@ -63,6 +63,8 @@ Other than its scale, LIVECell-CLS inherits from LIVECell a wide range of cell m
 
 The above picture describes the the process in which single-cell images are extracted from the LIVECell ones using the COCO annotations. The images are from eight cell lines (A172, BT-474, BV-2, Huh7, MCF7, SH-SY5Y, SkBr3, SK-OV-3) showcase inter-class and intra-class variability between the three days of imaging. Rows highlight increasing inter-class differences: (a) minimal variability with mostly rounded shapes, (b) distinct morphological traits like elongation, and (c) irregular, atypical structures. Intra-class consistency remains high, but Row (c)'s irregularity complicates classification due to potential class overlaps.
 
+The dataset is hosted on the [Kaggle platform](https://kaggle.com/datasets/4f9d6e01be82b388feb13f15ef781bd65142f59db3cd648061e8eccd01b850cf), where a tutorial notebook is also available.
+
 # Models 
 
 ## Baselines
@@ -135,8 +137,45 @@ pip install -r requirements.txt
 ```
 
 # Getting to know the Model
+The experimental setup is based on the Lightning API, and employs the LightningCLI that manages the hyperparameter configurations through yaml files. The configuration of most of our baseline and proposed architectures are provided in the ```_configs``` directory.
 
-## Training 
+## Training
+To train a model, find the corresponding CLI script (e.g. ```backbone_cli.py```, ```elegans_vision_cli.py```, ...), and the desired yaml configuration file (e.g. ```densenet161.yaml```, ```elegans_efficientnetv2m.yaml```, ...), then start the training with the LightningCLI. 
+
+For baseline CNN models like ResNet, DenseNet, and EfficientNetV2 (e.g. :
+
+```shell 
+python backbone_cli.py fit --config <yourconfig>.yaml
+```
+
+For baseline ViT models:
+
+```shell 
+python custom_vit_cli.py fit --config <yourconfig>.yaml
+```
+For baseline MLP-Mixer models:
+
+```shell 
+python mlpmixer_cli.py fit --config <yourconfig>.yaml
+```
+For ResNet-ViT models:
+
+```shell 
+python backbone_vit_cli.py fit --config <yourconfig>.yaml
+```
+
+For Elegans-ViT models:
+
+```shell 
+python elegansformer_cli.py fit --config <yourconfig>.yaml
+```
+For Elegans-MLP-Mixer models:
+
+```shell 
+python _cli.py fit --config <yourconfig>.yaml
+```
+
+(e.g. ```backbone_cli.py``` for baseline CNN models like ResNet or DenseNet, ```custom_vit_cli.py``` for ViT, ```elegansformer_cli.py``` for Elegans-ViT, ```mlpmixer_cli.py``` for MLP-Mixer
 
 ## Evaluation
 
