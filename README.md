@@ -237,7 +237,72 @@ python elegansmlpmixer_cli.py test --config <yourconfig>.yaml
 ```
 
 ## XAI Evaluation
-To apply XAI methods on a trained model
+The ```explainability_livecell_cli.py``` can be used to apply various explainability techniques (e.g., GradCAM, LIME, attention maps), analyzing baseline and tensor network-enhanced models introduced in our work. Below is a quick guide to execute the script and configure its parameters. 
 
+The script can be run with the following command:
+
+```shell
+python explainability_livecell_cli.py --config <yourconfig>.yaml [options]
+```
+
+The argument options can be configured according to the following table:
+
+| Argument             | Type    | Default           | Description                                                                                     |
+|----------------------|---------|-------------------|-------------------------------------------------------------------------------------------------|
+| `--config`           | `str`   | `config.yaml`     | Path to the Lightning CLI YAML configuration file for the model and data.                      |
+| `--model_type`       | `str`   | `vit`             | Type of model to analyze. Options: `vit`, `visionbackbone`, `elegansformer`, `visionelegans`, `mlpmixer`, `elegansmlpmixer`, `backbonevit`. |
+| `--model_name`       | `str`   | `model`           | Name to identify the model in outputs.                                                         |
+| `--ckpt_path`        | `str`   | `None`            | Path to the model checkpoint file.                                                             |
+| `--target_layer_names` | `str` | `None`            | Names of target layers for GradCAM methods (space-separated list).                            |
+| `--methods`          | `str`   | `gradcam`         | Explainability techniques to apply. Options include GradCAM variants, LIME, and attention maps. (See below for all options.)     |
+| `--eigen_smooth`     | `bool`  | `True`            | Use eigen-smooth for GradCAM methods.                                                         |
+| `--aug_smooth`       | `bool`  | `True`            | Use augmentation smoothing for GradCAM methods.                                               |
+| `--reshape_height_vit` | `int` | `16`              | Height of the latent image for ViT-like models in GradCAM methods.                            |
+| `--reshape_width_vit` | `int` | `16`              | Width of the latent image for ViT-like models in GradCAM methods.                             |
+| `--plot_imgs`        | `bool`  | `False`           | Whether to display generated images during execution.                                          |
+| `--return_masked_img` | `str` | `all`             | Specify which attention-masked images to return: `all`, `last`, `mean`.                        |
+| `--img_paths`        | `str`   | `example.png`     | Path(s) to input images (space-separated list).                                                |
+| `--out_dir`          | `str`   | `_explainability` | Directory for output files.                                                                    |
+| `--device`           | `str`   | `cuda`/`cpu`      | Device to use for inference.                                                                   |
+| `--image_weight`     | `float` | `0.5`             | Weight for overlaying the explainability map on the image.                                      |
+
+Specify one or more GradCAM methods using the `--methods` parameter. At the moment, the following are supported:
+
+- `gradcam` ([GradCAM](https://arxiv.org/abs/1610.02391))
+- `xgradcam` ([XGradCAM](https://arxiv.org/abs/2008.02312v4))
+- `gradcampp` ([GradCAM++](https://arxiv.org/abs/1710.11063))
+- `gradcamelementwise` ([Element-Wise GradCAM](https://doi.org/10.1609/aaai.v35i3.16344))
+- `eigencam` ([Eigen-CAM](https://arxiv.org/abs/2008.00299))
+- `eigengradcam` ([Eigen-GradCAM](https://jacobgil.github.io/pytorch-gradcam-book/introduction.html))
+- `fullgradcam` ([Full-Grad](https://arxiv.org/abs/1905.00780))
+- `hirescam` ([HiResCAM](https://arxiv.org/abs/2011.08891))
+- `layercam` ([LayerCAM](https://ieeexplore.ieee.org/document/9462463))
+- `scorecam` ([Score-CAM](https://arxiv.org/abs/1910.01279))
+- `randomcam` ([RandomCAM](https://jacobgil.github.io/pytorch-gradcam-book/introduction.html))
+- `ablationcam` ([AblationCAM](https://openaccess.thecvf.com/content_WACV_2020/papers/Desai_Ablation-CAM_Visual_Explanations_for_Deep_Convolutional_Network_via_Gradient-free_Localization_WACV_2020_paper.pdf))
+
+Other explainability methods include:
+- `attentionmap` (for attention-based models, based on [Attention Rollouts](https://arxiv.org/abs/2005.00928))
+- `lime` ([Local Interpretable Model-Agnostic Explanations](https://arxiv.org/abs/1602.04938))
+
+Here is an example:
+
+```shell
+python explainability_livecell_cli.py \
+  --config config.yaml \
+  --model_type vit \
+  --ckpt_path checkpoints/model.ckpt \
+  --target_layer_names layer1 layer2 \
+  --methods gradcam attentionmap \
+  --img_paths example1.png example2.png \
+  --out_dir results \
+  --device cuda
+```
+Results (e.g., explainability maps) are saved in the specified `--out_dir`, organized by model type and name. Subfolders contain maps for each explainability method.
 
 # Acknowledgements and references
+We sincerely thank the authors of the original [LIVECell dataset](https://doi.org/10.1038/s41592-021-01249-6) (Edlund, Christoffer, et al. "LIVECell—A large-scale dataset for label-free live cell segmentation." Nature methods 18.9 (2021): 1038-1045.) for providing the data to construct the LIVECell-CLS dataset.
+
+Furthermore, we acknowledge the author of the [pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam) repository, which our XAI code was based upon.
+
+
