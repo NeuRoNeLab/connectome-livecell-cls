@@ -41,7 +41,8 @@
    - [Installing Requirements](#installing-requirements)
 7. [Getting to know the Model](#getting-to-know-the-model)
    - [Training](#training)
-   - [Evaluation](#evaluation)
+   - [Test Evaluation](#test-evaluation)
+   - [XAI Evaluation](#xai-evaluation)
 8. [Acknowledgements and references](#acknowledgements-and-references)  
 
 # Introduction
@@ -140,55 +141,103 @@ pip install -r requirements.txt
 The experimental setup is based on the Lightning API, and employs the LightningCLI that manages the hyperparameter configurations through yaml files. The configuration of most of our baseline and proposed architectures are provided in the ```_configs``` directory. Of course, specific directory paths and logging informations need to be updated in order to be used on any machine.
 
 ## Logging
-By default, the Weights & Biases (WandB) platform is used to track the experiments, which needs you to have an account and be logged in it on your machine. This is done by the following command:
+By default, the Weights & Biases (WandB) platform is used to track the experiments, which needs you to have an account and be logged in it on your machine. This is done by the following command (which later requires you to input your username and private API key):
 
 ```shell 
 python wandb login
 ```
 Refer to the [WandB site](https://wandb.ai/site) for more information.
 
-In each configuration yaml file, you can update the logging settings (including, most importantly, the name of the project) by modifying the ```logger``` field values according to your preferences. You can also replace WandB logging by replacing the logging fields with the default ```CSVLogger``` or disable logging entirely by setting ```logger``` to ```null```.
+In each configuration yaml file, you can update the logging settings (including, most importantly, the name of the project) by modifying the ```logger``` field values according to your preferences. You can also replace WandB logging by replacing the logging fields with the default ```CSVLogger``` or disable logging entirely by setting ```logger``` to ```null```. You can also customize the model settings according to your preferences (reference the code documentation for a detailed explaination of each field).
 
 ## Training
 To train a model, find the corresponding CLI script (e.g. ```backbone_cli.py```, ```elegans_vision_cli.py```, ...), and the desired yaml configuration file (e.g. ```densenet161.yaml```, ```elegans_efficientnetv2m.yaml```, ...), then start the training with the LightningCLI. 
 
-For baseline CNN models like ResNet, DenseNet, and EfficientNetV2 (e.g. :
+For baseline CNN models like ResNet, DenseNet, and EfficientNetV2 (e.g. ```resnet18.yaml```, ```densenet161.yaml```, ```efficientnetv2_s.yaml```):
 
 ```shell 
 python backbone_cli.py fit --config <yourconfig>.yaml
 ```
 
-For baseline ViT models:
+For baseline ViT models (e.g. ```custom_vit_b32_livecell.yaml```, ```custom_vit_b16_livecell.yaml```):
 
 ```shell 
 python custom_vit_cli.py fit --config <yourconfig>.yaml
 ```
-For baseline MLP-Mixer models:
+
+For baseline MLP-Mixer models (e.g. ```mlpmixer_b32_livecell.yaml```, ```mlpmixer_b16_livecell.yaml```):
 
 ```shell 
 python mlpmixer_cli.py fit --config <yourconfig>.yaml
 ```
-For ResNet-ViT models:
+For ResNet-ViT models (e.g. ```resnet101-vit-b1.yaml```):
 
 ```shell 
 python backbone_vit_cli.py fit --config <yourconfig>.yaml
 ```
 
-For Elegans-ViT models:
+For Elegans variants of CNN models like Elegans-ResNet, Elegans-DenseNet, and Elegans-EfficientNetV2 (e.g. ```elegans_resnet18.yaml```, ```elegans_densenet161.yaml```, ```elegans_efficientnetv2_s.yaml```):
+
+```shell 
+python elegans_vision_cli.py fit --config <yourconfig>.yaml
+```
+
+For Elegans-ViT models (e.g. ```elegansformer_b32_livecell.yaml```, ```elegansformer_b16_livecell.yaml```):
 
 ```shell 
 python elegansformer_cli.py fit --config <yourconfig>.yaml
 ```
-For Elegans-MLP-Mixer models:
+For Elegans-MLP-Mixer models (e.g. ```elegansmlpmixer_b32_livecell.yaml```, ```elegansmlpmixer_b16_livecell.yaml```):
 
 ```shell 
-python _cli.py fit --config <yourconfig>.yaml
+python elegansmlpmixer_cli.py fit --config <yourconfig>.yaml
 ```
 
-(e.g. ```backbone_cli.py``` for baseline CNN models like ResNet or DenseNet, ```custom_vit_cli.py``` for ViT, ```elegansformer_cli.py``` for Elegans-ViT, ```mlpmixer_cli.py``` for MLP-Mixer
+## Test Evaluation
+To evaluate a model on the LIVECell-CLS test set, find the corresponding CLI script (e.g. ```backbone_cli.py```, ```elegans_vision_cli.py```, ...), and the desired yaml configuration file (e.g. ```densenet161.yaml```, ```elegans_efficientnetv2m.yaml```, ...), then start the inference with the LightningCLI. 
 
-## Evaluation
+For baseline CNN models like ResNet, DenseNet, and EfficientNetV2 (e.g. ```resnet18.yaml```, ```densenet161.yaml```, ```efficientnetv2_s.yaml```):
 
+```shell 
+python backbone_cli.py test --config <yourconfig>.yaml
+```
+
+For baseline ViT models (e.g. ```custom_vit_b32_livecell.yaml```, ```custom_vit_b16_livecell.yaml```):
+
+```shell 
+python custom_vit_cli.py test --config <yourconfig>.yaml
+```
+
+For baseline MLP-Mixer models (e.g. ```mlpmixer_b32_livecell.yaml```, ```mlpmixer_b16_livecell.yaml```):
+
+```shell 
+python mlpmixer_cli.py test --config <yourconfig>.yaml
+```
+For ResNet-ViT models (e.g. ```resnet101-vit-b1.yaml```):
+
+```shell 
+python backbone_vit_cli.py test --config <yourconfig>.yaml
+```
+
+For Elegans variants of CNN models like Elegans-ResNet, Elegans-DenseNet, and Elegans-EfficientNetV2 (e.g. ```elegans_resnet18.yaml```, ```elegans_densenet161.yaml```, ```elegans_efficientnetv2_s.yaml```):
+
+```shell 
+python elegans_vision_cli.py test --config <yourconfig>.yaml
+```
+
+For Elegans-ViT models (e.g. ```elegansformer_b32_livecell.yaml```, ```elegansformer_b16_livecell.yaml```):
+
+```shell 
+python elegansformer_cli.py test --config <yourconfig>.yaml
+```
+For Elegans-MLP-Mixer models (e.g. ```elegansmlpmixer_b32_livecell.yaml```, ```elegansmlpmixer_b16_livecell.yaml```):
+
+```shell 
+python elegansmlpmixer_cli.py test --config <yourconfig>.yaml
+```
+
+## XAI Evaluation
+To apply XAI methods on a trained model
 
 
 # Acknowledgements and references
