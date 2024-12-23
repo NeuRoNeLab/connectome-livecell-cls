@@ -144,7 +144,7 @@ The experimental setup is based on the Lightning API, and employs the LightningC
 By default, the Weights & Biases (WandB) platform is used to track the experiments, which needs you to have an account and be logged in it on your machine. This is done by the following command (which later requires you to input your username and private API key):
 
 ```shell 
-python wandb login
+wandb login
 ```
 Refer to the [WandB site](https://wandb.ai/site) for more information.
 
