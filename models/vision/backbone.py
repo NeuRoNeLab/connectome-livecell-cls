@@ -52,7 +52,11 @@ class TorchVisionBackbone(SerializableModule):
                 in_channels = self.backbone.classifier[-1].in_features
             else:
                 in_channels = self.backbone.classifier.in_features
-            self._backbone.classifier = torch.nn.Linear(in_channels, self.config.output_dim)
+            if 'convnext' in self.config.name:
+                in_channels = self.backbone.classifier[-1].in_features
+                self._backbone.classifier[-1] = torch.nn.Linear(in_channels, self.config.output_dim)
+            else:
+                self._backbone.classifier = torch.nn.Linear(in_channels, self.config.output_dim)
 
             # self._backbone.classifier = torch.nn.Sequential(
             #     torch.nn.Linear(in_channels, 512),
@@ -62,6 +66,9 @@ class TorchVisionBackbone(SerializableModule):
         elif hasattr(self.backbone, "fc"):
             in_channels = self.backbone.fc.in_features
             self.backbone.fc = torch.nn.Linear(in_channels, self.config.output_dim)
+        elif hasattr(self.backbone, "head"):
+            in_channels = self._backbone.head.in_features
+            self._backbone.head = torch.nn.Linear(in_channels, self.config.output_dim)
 
     def check_backbone_input(self):
         if self.config.in_channels == 1 and isinstance(self.backbone, torch.nn.Sequential) and \
