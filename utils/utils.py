@@ -344,6 +344,22 @@ def timing(f):
 def timed_model_call(model, *args, **kwargs):
     return model(*args, **kwargs)
 
+def time_for_model_call(model, *args, **kwargs) -> float:
+    ts = time()
+    result = model(*args, **kwargs)
+    te = time()
+    return te - ts
+
+def average_time_model_call(model, n_calls: int = 20, *args, **kwargs) -> float:
+
+    # Warmup (cache stuff)
+    time_for_model_call(model, *args, **kwargs)
+
+    times = []
+    for _ in range(0, n_calls + 1):
+        times.append(time_for_model_call(model, *args, **kwargs))
+
+    return sum(times) / len(times)
 
 class SerializableConfig(dict):
 
