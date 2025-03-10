@@ -1,8 +1,6 @@
 from enum import Enum
 from typing import Type, Union, Optional, Dict, Any, NamedTuple
 import torch
-from torchvision.models import ResNet
-
 from models.vision.backbone_utils import get_torchvision_backbone, TorchVisionBackboneConfig
 from utils.utils import SerializableConfig
 from models.layers.misc import SerializableModule
