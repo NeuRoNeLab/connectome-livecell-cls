@@ -14,8 +14,12 @@ from ds.livecell_dataset import CellDataset
 from explainability.gradcam_utils import METHODS, apply_cam, resolve_target_layers, reshape_transform_vit, \
     get_img_paths, reshape_transform_general
 from explainability.attentionmap import attention_rollout
+from models.elegans_vision.elegans_convnext import ElegansConvNextConfig
+from models.elegans_vision.elegans_convnext_lit_wrapper import ElegansConvNextWrapper
 from models.elegans_vision.elegans_vision import VisionElegansConfig
 from models.elegans_vision.elegans_vision_lit_wrapper import VisionElegansWrapper
+from models.elegansformer.elegans_swin import ElegansSwinConfig
+from models.elegansformer.elegans_swin_lit_wrapper import ElegansSwinWrapper
 from models.elegansformer.elegansformer import ElegansFormerConfig
 from models.elegansformer.elegansformer_lit_wrapper import ElegansFormerWrapper
 from models.elegansmixer.elegansmlpmixer import ElegansMLPMixerConfig
@@ -25,9 +29,14 @@ from models.fpelegans.fpelegans_lit_wrapper import FPElegansWrapper
 from models.vision.backbone_vit import BackboneViTConfig, BackboneViT
 from models.vision.mlpmixer import MLPMixerConfig
 from models.vision.mlpmixer_lit_wrapper import MLPMixerWrapper
+from models.vision.swin_v2 import CustomSwinConfig, SwinTransformerV2
+from models.vision.swin_v2_lit_wrapper import CustomSwinWrapper
 from models.vision.vit import CustomViTConfig
 from models.vision.vit_lit_wrapper import CustomViTWrapper
 from models.vision.backbone import TorchVisionBackboneConfig
+from models.vision.convnext import CustomConvNextConfig
+from models.vision.convnext_lit_wrapper import CustomConvNextWrapper
+
 from models.vision.backbone_lit_wrapper import BackboneWrapper
 from explainability.lime_utils import lime_explain
 from lime import lime_image
@@ -71,6 +80,22 @@ def main(args):
             for k in config_args
         }
         model = CustomViTWrapper(CustomViTConfig(**config_args))
+    elif args.model_type == "swin":
+        type_hints = typing.get_type_hints(CustomSwinConfig.__init__)
+        config_args = {
+            k: config_args[k] if not (isinstance(type_hints[k], type) and issubclass(type_hints[k], enum.Enum))
+            else getattr(type_hints[k], config_args[k])
+            for k in config_args
+        }
+        model = CustomSwinWrapper(CustomSwinConfig(**config_args))
+    elif args.model_type == "elegans_swin":
+        type_hints = typing.get_type_hints(ElegansSwinConfig.__init__)
+        config_args = {
+            k: config_args[k] if not (isinstance(type_hints[k], type) and issubclass(type_hints[k], enum.Enum))
+            else getattr(type_hints[k], config_args[k])
+            for k in config_args
+        }
+        model = ElegansSwinWrapper(ElegansSwinConfig(**config_args))
     elif args.model_type == "visionbackbone":
         type_hints = typing.get_type_hints(TorchVisionBackboneConfig.__init__)
         config_args = {
@@ -79,6 +104,14 @@ def main(args):
             for k in config_args
         }
         model = BackboneWrapper(TorchVisionBackboneConfig(**config_args))
+    elif args.model_type == "convnext":
+        type_hints = typing.get_type_hints(CustomConvNextConfig.__init__)
+        config_args = {
+            k: config_args[k] if not (isinstance(type_hints[k], type) and issubclass(type_hints[k], enum.Enum))
+            else getattr(type_hints[k], config_args[k])
+            for k in config_args
+        }
+        model = CustomConvNextWrapper(CustomConvNextConfig(**config_args))
     elif args.model_type == "elegansformer":
         type_hints = typing.get_type_hints(ElegansFormerConfig.__init__)
         config_args = {
@@ -95,6 +128,14 @@ def main(args):
             for k in conf
         }
         model = VisionElegansWrapper(VisionElegansConfig(**conf))
+    elif args.model_type == "elegans_convnext":
+        type_hints = typing.get_type_hints(ElegansConvNextConfig.__init__)
+        conf = {
+            k: conf[k] if not (isinstance(type_hints[k], type) and issubclass(type_hints[k], enum.Enum))
+            else getattr(type_hints[k], conf[k])
+            for k in conf
+        }
+        model = ElegansConvNextWrapper(ElegansConvNextConfig(**conf))
     elif args.model_type == "mlpmixer":
         type_hints = typing.get_type_hints(MLPMixerConfig.__init__)
         config_args = {
@@ -124,14 +165,14 @@ def main(args):
     else:
         raise ValueError(f"Unsupported model type: {args.model_type}")
 
-    if "attentionmap" in args.methods and model_type not in ["vit", "elegansformer", "backbonevit"]:
+    if "attentionmap" in args.methods and model_type not in ["vit", "elegansformer", "backbonevit", "swin", "elegans_swin"]:
         raise ValueError(f"Unsupported model type {args.model_type} for method {args.method}")
 
     # Load state dict
     ckpt = torch.load(ckpt_path, map_location=args.device)
-    model.load_state_dict(ckpt['state_dict'])
+    model.load_state_dict(ckpt['state_dict'], strict=False)
     model = model.to(args.device)
-    # print(model)
+    # print(model._vit.stages[0])
     # exit()
     print("Model loaded.")
 
@@ -152,7 +193,7 @@ def main(args):
         reshape_transform_vit,
         height=args.reshape_height_vit,
         width=args.reshape_width_vit,
-    ) if model_type in ["vit", "elegansformer", "mlpmixer", "elegansmlpmixer"] else functools.partial(reshape_transform_general)
+    ) if model_type in ["vit", "elegansformer", "mlpmixer", "elegansmlpmixer", "swin", "elegans_swin"] else functools.partial(reshape_transform_general)
 
     img_paths = get_img_paths(args.img_paths)[0]
 
@@ -211,11 +252,11 @@ def main(args):
                     model=model,
                     input_tensor=img_tensor,
                     scaled_rgb_img=img_array_rgb_scaled,
-                    target_layers=resolve_target_layers(model=model, target_layers_ids=target_layer_names),
+                    target_layers=[] if method == 'fullgradcam' else resolve_target_layers(model=model, target_layers_ids=target_layer_names),
                     prediction=prediction,
                     out_dir=target_path,
                     reshape_transform=functools.partial(reshape_transform, method=method)
-                                      if model_type in ["vit", "elegansformer", "mlpmixer", "elegansmlpmixer"] else None,
+                                      if model_type in ["vit", "elegansformer", "mlpmixer", "elegansmlpmixer", "swin", "elegans_swin"] else None,
                     eigen_smooth=args.eigen_smooth if method != "hirescam" else False,
                     aug_smooth=args.aug_smooth if method != "hirescam" else False,
                     category=label,
@@ -230,7 +271,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default="config.yaml", help="lightning CLI yaml config file")
     parser.add_argument("--model_type", type=str, default="vit", help="model type",
-                        choices=["vit", "visionbackbone", "elegansformer", "visionelegans", "mlpmixer", "elegansmlpmixer", "backbonevit"])
+                        choices=["vit", "visionbackbone", "elegansformer", "visionelegans", "mlpmixer", "elegansmlpmixer",
+                                 "backbonevit", "convnext", "elegans_convnext", "swin", "elegans_swin"])
     parser.add_argument("--model_name", type=str, default="model", help="model name")
     parser.add_argument("--ckpt_path", type=str, default=None, help="path to checkpoint file")
     parser.add_argument("--target_layer_names", type=str, default=None, help="target layer names",
