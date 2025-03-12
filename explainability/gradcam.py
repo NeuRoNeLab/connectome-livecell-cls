@@ -15,8 +15,15 @@ class ActivationsAndGradientsV2(ActivationsAndGradients):
     """ Class for extracting activations and
     registering gradients from targetted intermediate layers """
 
-    def __init__(self, model, target_layers, reshape_transform):
+    def __init__(self, model, target_layers, reshape_transform, layer_keys=None):
         super().__init__(model, target_layers, reshape_transform)
+        self.layer_keys = layer_keys
+
+        if layer_keys is not None:
+            self.layer_keys_in_storage_order = []
+            self.layers_ids = {
+                hash(layer): layer_key for layer, layer_key in zip(target_layers, layer_keys)
+            }
 
     def save_activation(self, module, input, output):
 
@@ -28,7 +35,25 @@ class ActivationsAndGradientsV2(ActivationsAndGradients):
     def save_gradient(self, module, input, output):
         if isinstance(output, (tuple, list)):
             output = output[0]
-        super().save_gradient(module, input, output)
+
+        if self.layer_keys is not None:
+            layer_key = self.layers_ids[hash(module)]
+            self.layer_keys_in_storage_order.append(layer_key)
+
+        # super().save_gradient(module, input, output)
+
+        # Code from super-scall, need this to fix bug with fullgradcam
+        if not hasattr(output, "requires_grad") or not output.requires_grad:
+            # You can only register hooks on tensor requires grad.
+            return
+
+        # Gradients are computed in reverse order
+        def _store_grad(grad):
+            if self.reshape_transform is not None:
+                grad = self.reshape_transform(grad)
+            self.gradients = [grad.cpu().detach()] + self.gradients
+
+        output.register_hook(_store_grad)
 
 
 class BaseCAMV2(BaseCAM):
@@ -402,13 +427,24 @@ class FullGradV2(BaseCAMV2):
 
         target_layers = find_layer_predicate_recursive(
             model, layer_with_2D_bias)
+
+        layer_keys = []
+        i = 0
+        for key, layer in model.named_modules():
+            if i < len(target_layers) and layer == target_layers[i]:
+                layer_keys.append(key)
+                i += 1
+        self.layer_keys = layer_keys
+
         super(FullGradV2, self).__init__(
             model,
             target_layers,
             reshape_transform,
             compute_input_gradient=True)
+        self.activations_and_grads = ActivationsAndGradientsV2(self.model, target_layers, reshape_transform, layer_keys)
         self.bias_data = [self.get_bias_data(
             layer).cpu().numpy() for layer in target_layers]
+        self.reordered_bias_list = False
 
     def get_bias_data(self, layer):
         # Borrowed from official paper impl:
@@ -425,6 +461,16 @@ class FullGradV2(BaseCAMV2):
             input_tensor,
             target_category,
             eigen_smooth):
+
+        if not self.reordered_bias_list:
+            # Need this to fix bug with activations and gradients being saved in the execution order and the biases
+            # being saved in the module instantiation order
+            self.bias_data = [
+                self.get_bias_data(self.model.get_submodule(layer_key)).cpu().numpy()
+                for layer_key in self.activations_and_grads.layer_keys_in_storage_order
+            ]
+            self.reordered_bias_list = True
+
         input_grad = input_tensor.grad.data.cpu().numpy()
         grads_list = [g.cpu().data.numpy() for g in
                       self.activations_and_grads.gradients]

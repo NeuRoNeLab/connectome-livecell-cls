@@ -55,6 +55,8 @@ def reshape_transform_vit(tensor: Union[torch.Tensor, Tuple[torch.Tensor], List[
         return tensor
     else:
         result = tensor[:, 1:, :].reshape(t_size[0], height, width, t_size[-1])  # remove cls token
+        #Use this only for Swin
+        # result = tensor[:, :, :].reshape(t_size[0], height, width, t_size[-1])  # remove cls token
 
     # Bring the channels to the first dimension, like in CNNs.
     result = result.transpose(2, 3).transpose(1, 2)
